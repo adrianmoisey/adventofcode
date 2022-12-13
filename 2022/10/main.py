@@ -16,10 +16,7 @@ for i in input.split('\n'):
 cycle = 1
 total = []
 
-while True:
-    if len(stack) == 0:
-        break
-
+while len(stack) != 0:
     cycle += 1
     instruction = stack.popleft()
 
