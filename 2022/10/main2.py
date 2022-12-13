@@ -18,15 +18,12 @@ horizontal = 0
 # Look Jonathan, a list comprehension!
 display = [['.'] * 40 for _ in range(6)]
 
-while True:
+while len(stack) != 0:
     sprite = [X + (40 * horizontal), X+1 + (40 * horizontal), X+2 + (40 * horizontal)]
 
     if cycle in sprite:
         tmp_cycle = cycle - (40 * horizontal)
         display[horizontal][tmp_cycle-1] = "#"
-
-    if len(stack) == 0:
-        break
 
     if (cycle) % 40 == 0:
         horizontal += 1
