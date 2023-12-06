@@ -70,17 +70,13 @@ func main() {
 
 		var action, from, to string
 
-		fmt.Println("=============")
 		input_split := strings.Split(word, " ")
-		fmt.Println(input_split)
 
 		if input_split[0] == "toggle" {
 			action, from, to = input_split[0], input_split[1], input_split[3]
 		} else {
 			action, from, to = input_split[1], input_split[2], input_split[4]
 		}
-
-		fmt.Println(action, from, to)
 
 		from_split := strings.Split(from, ",")
 		to_split := strings.Split(to, ",")
@@ -90,8 +86,6 @@ func main() {
 
 		to_x_i, _ := strconv.Atoi(to_split[0])
 		to_y_i, _ := strconv.Atoi(to_split[1])
-
-		// fmt.Println(from_x_i, from_y_i, to_x_i, to_y_i, action)
 
 		if action == "on" {
 			grid = on(from_x_i, from_y_i, to_x_i, to_y_i, grid)
@@ -111,5 +105,4 @@ func main() {
 
 	fmt.Println("Part 1")
 	fmt.Println(counter)
-
 }
