@@ -30,7 +30,6 @@ func main() {
 		var firstInt string
 		var lastInt string
 
-		ogLine := line
 		startLine := line
 		endLine := line
 
@@ -53,7 +52,6 @@ func main() {
 			}
 
 			startLine = strings.ReplaceAll(startLine, lookupIndex, lookup[lookupIndex])
-
 			break
 		}
 
@@ -95,7 +93,6 @@ func main() {
 			}
 		}
 		value := firstInt + lastInt
-		fmt.Println(value, ogLine, startLine, endLine)
 		intValue, _ := strconv.Atoi(value)
 
 		total += intValue
