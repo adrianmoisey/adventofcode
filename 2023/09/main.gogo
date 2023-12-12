@@ -1,0 +1,61 @@
+package main
+
+import (
+	_ "embed"
+	"fmt"
+	"slices"
+	"strconv"
+	"strings"
+)
+
+//go:embed input.txt
+var input string
+var Line []int64
+var Total int64
+
+func differences(a []int) []int {
+	// base case
+	if slices.Max(a) == 0 && slices.Min(a) == 0 {
+		fmt.Println(a)
+		return append(a, 0)
+	}
+
+	var differenceInt []int
+
+	// find differences
+	for i := range a {
+		if len(a) == i+1 {
+			break
+		}
+		num := a[i+1] - a[i]
+		differenceInt = append(differenceInt, num)
+	}
+	nextDifferences := differences(differenceInt)
+
+	newCharacter := nextDifferences[len(nextDifferences)-1]
+	z := differenceInt[len(differenceInt)-1] + newCharacter
+
+	return append(differenceInt, z)
+}
+
+func main() {
+	lines := strings.Split(strings.TrimSpace(input), "\n")
+	for _, line := range lines {
+		numbers := strings.Split(line, " ")
+		var intLine []int
+
+		for _, num := range numbers {
+			numI, _ := strconv.Atoi(num)
+			intLine = append(intLine, numI)
+		}
+
+		firstDifferences := differences(intLine)
+		Difference := firstDifferences[len(firstDifferences)-1]
+		Last := intLine[len(intLine)-1]
+		Sum := int64(Difference + Last)
+		//fmt.Println(Sum)
+		Total += Sum
+	}
+	// Too high - 2005352338
+	fmt.Println(Total)
+}

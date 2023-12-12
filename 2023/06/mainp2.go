@@ -40,7 +40,7 @@ func main() {
 				LongerThanDistance++
 			}
 
-			//fmt.Println(ButtonHold, CarMoved)
+			fmt.Println(ButtonHold, CarMoved)
 			if Below == true && Above == false && CarMoved > RaceDistance {
 				Above = true
 				Below = false

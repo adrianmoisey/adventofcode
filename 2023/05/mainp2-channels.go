@@ -3,18 +3,19 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
+	"sync"
 )
 
-//go:embed sample.txt
+//go:embed input.txt
 var input string
 
 var (
-	locations     []int
-	Seeds         []string
-	Mappings      = make(map[string]Mapping)
-	locationSmall int
+	locations []int
+	Seeds     []string
+	Mappings  = make(map[string]Mapping)
 )
 
 type Row struct {
@@ -51,11 +52,8 @@ func main() {
 		}
 		// Populate Seeds
 		if strings.Contains(line, "seeds") {
-			fmt.Println(line)
 			seeds := strings.SplitN(line, " ", 2)[1]
 			Seeds = strings.Fields(seeds)
-
-			fmt.Println(Seeds)
 
 			result := make([]string, 0, len(Seeds)/2)
 			for i := 1; i < len(Seeds); i += 2 {
@@ -84,43 +82,70 @@ func main() {
 		NewMapping.Rows = append(NewMapping.Rows, row)
 	}
 
-	for _, seedTuple := range Seeds {
-		fmt.Println(seedTuple)
+	var smol int
+	smol = math.MaxInt16
 
+	for _, seedTuple := range Seeds {
 		seedStart := strings.Split(seedTuple, ",")[0]
 		seedStartInt, _ := strconv.Atoi(seedStart)
 		seedRange := strings.Split(seedTuple, ",")[1]
 		seedRangeInt, _ := strconv.Atoi(seedRange)
 
-		for seed := seedStartInt; seed < seedStartInt+seedRangeInt+1; seed += 1 {
+		resultChan := make(chan int, 100000)
+		doneChan := make(chan struct{})
 
-			m := Mappings["seed-to-soil"]
-			soil := m.FindPosition(seed)
-			m = Mappings["soil-to-fertilizer"]
-			fertilizer := m.FindPosition(soil)
+		var wg sync.WaitGroup
 
-			m = Mappings["fertilizer-to-water"]
-			water := m.FindPosition(fertilizer)
-
-			m = Mappings["water-to-light"]
-			light := m.FindPosition(water)
-
-			m = Mappings["light-to-temperature"]
-			temperature := m.FindPosition(light)
-
-			m = Mappings["temperature-to-humidity"]
-			humidity := m.FindPosition(temperature)
-
-			m = Mappings["humidity-to-location"]
-			location := m.FindPosition(humidity)
-
-			if locationSmall == 0 {
-				locationSmall = location
-			} else if locationSmall > location {
-				locationSmall = location
+		go func() {
+			for result := range resultChan {
+				if result < smol {
+					smol = result
+				}
 			}
+		}()
+
+		for seed := seedStartInt; seed < seedStartInt+seedRangeInt+1; seed += 1 {
+			fmt.Println("h")
+			wg.Add(1)
+
+			go FindLocation(seed, resultChan, &wg)
 		}
+
+		go func() {
+			wg.Wait()
+			close(resultChan)
+			close(doneChan)
+		}()
+
+		<-doneChan
+
 	}
 
-	fmt.Println(locationSmall)
+	fmt.Println(smol)
+}
+
+func FindLocation(seed int, resultChan chan<- int, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	m := Mappings["seed-to-soil"]
+	soil := m.FindPosition(seed)
+	m = Mappings["soil-to-fertilizer"]
+	fertilizer := m.FindPosition(soil)
+
+	m = Mappings["fertilizer-to-water"]
+	water := m.FindPosition(fertilizer)
+
+	m = Mappings["water-to-light"]
+	light := m.FindPosition(water)
+
+	m = Mappings["light-to-temperature"]
+	temperature := m.FindPosition(light)
+
+	m = Mappings["temperature-to-humidity"]
+	humidity := m.FindPosition(temperature)
+
+	m = Mappings["humidity-to-location"]
+	location := m.FindPosition(humidity)
+
+	resultChan <- location
 }

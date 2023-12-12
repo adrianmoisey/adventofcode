@@ -1,0 +1,64 @@
+package main
+
+import (
+	_ "embed"
+	"fmt"
+	"strings"
+)
+
+//go:embed input.txt
+var input string
+
+var (
+	total   int
+	Mapping map[string]Node
+)
+
+type Node struct {
+	Left  string
+	Right string
+}
+
+func (n *Node) Next(letter string) string {
+	if letter == "L" {
+		return n.Left
+	}
+	return n.Right
+
+}
+
+func main() {
+	Mapping = make(map[string]Node)
+	lines := strings.Split(strings.TrimSpace(input), "\n")
+	Moves := lines[0]
+	for _, line := range lines[2:] {
+		split := strings.Split(line, " ")
+		Name := split[0]
+		Left := split[2][1:4]
+		Right := split[3][:3]
+		node := Node{Left: Left, Right: Right}
+		Mapping[Name] = node
+	}
+	fmt.Println(Mapping)
+
+	i := 0
+	count := 1
+	nextNode := Mapping["AAA"]
+	end := "ZZZ"
+
+	for {
+		if i == len(Moves) {
+			i = 0
+		}
+		nextNodeString := nextNode.Next(string(Moves[i]))
+		if nextNodeString == end {
+			fmt.Println("BREAK")
+			break
+		}
+		nextNode = Mapping[nextNodeString]
+		count++
+		i++
+	}
+
+	fmt.Println("Total: ", count)
+}

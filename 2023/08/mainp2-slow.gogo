@@ -1,0 +1,78 @@
+package main
+
+import (
+	_ "embed"
+	"fmt"
+	"strings"
+)
+
+//go:embed input.txt
+var input string
+
+var (
+	total         int
+	Mapping       map[string]Node
+	StartingNodes []Node
+)
+
+type Node struct {
+	Name string
+
+	Left  string
+	Right string
+}
+
+func (n *Node) Next(letter string) string {
+	if letter == "L" {
+		return n.Left
+	}
+	return n.Right
+
+}
+
+func main() {
+	Mapping = make(map[string]Node)
+	lines := strings.Split(strings.TrimSpace(input), "\n")
+	Moves := lines[0]
+	for _, line := range lines[2:] {
+		split := strings.Split(line, " ")
+		Name := split[0]
+		Left := split[2][1:4]
+		Right := split[3][:3]
+		node := Node{Left: Left, Right: Right, Name: Name}
+		Mapping[Name] = node
+		if string(Name[2]) == "A" {
+			StartingNodes = append(StartingNodes, node)
+		}
+	}
+
+	i := 0
+	count := 1
+
+	for {
+		endCounter := 0
+		if i == len(Moves) {
+			i = 0
+		}
+
+		for index, node := range StartingNodes {
+			nodeNextString := node.Next(string(Moves[i]))
+			if string(nodeNextString[2]) == "Z" {
+				fmt.Println("Found  Z")
+				endCounter++
+			}
+			node = Mapping[nodeNextString]
+			StartingNodes[index] = node
+		}
+		//fmt.Println(StartingNodes, endCounter)
+		if endCounter == len(StartingNodes) {
+
+			fmt.Println("BREAK")
+			break
+		}
+		count++
+		i++
+	}
+
+	fmt.Println("Total: ", count)
+}
