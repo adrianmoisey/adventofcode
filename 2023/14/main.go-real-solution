@@ -1,0 +1,122 @@
+package main
+
+import (
+	_ "embed"
+	"fmt"
+	"slices"
+	"strings"
+)
+
+//go:embed sample.txt
+var input string
+var newGrid [][]string
+var total int
+
+func GridFlipper(InputGrid [][]string) (OutPutGrid [][]string) {
+	OutPutGrid = make([][]string, 0)
+
+	for j := 0; j < len(InputGrid[0]); j++ {
+		newLine := []string{}
+
+		for i := 0; i < len(InputGrid); i++ {
+			newLine = append(newLine, string(InputGrid[i][j]))
+		}
+
+		OutPutGrid = append(OutPutGrid, newLine)
+	}
+	slices.Reverse(OutPutGrid)
+
+	return OutPutGrid
+}
+
+func GridSpinner(InputGrid [][]string) (OutPutGrid [][]string) {
+	OutPutGrid = make([][]string, 0)
+
+	for j := 0; j < len(InputGrid[0]); j++ {
+		newLine := []string{}
+
+		for i := 0; i < len(InputGrid); i++ {
+			newLine = append(newLine, string(InputGrid[i][j]))
+		}
+		slices.Reverse(newLine)
+		OutPutGrid = append(OutPutGrid, newLine)
+	}
+
+	return OutPutGrid
+}
+
+func MoveBalls(InputGrid [][]string) (OutPutGrid [][]string) {
+	for _, line := range newGrid {
+		Moved := true
+		for Moved == true {
+
+			Moved = false
+			for i := range line {
+
+				// We find an O, try move it back
+				if line[i] == "O" && i-1 >= 0 {
+					if line[i-1] == "." {
+						line[i-1] = "O"
+						line[i] = "."
+						Moved = true
+					}
+				}
+			}
+		}
+	}
+	return newGrid
+}
+
+func main() {
+	linesInput := strings.Split(strings.TrimSpace(input), "\n")
+	// string to slices
+	newGrid = make([][]string, 0)
+
+	for _, line := range linesInput {
+		newLine := []string{}
+		for _, c := range line {
+
+			newLine = append(newLine, string(c))
+		}
+		newGrid = append(newGrid, newLine)
+	}
+	LineLength := len(newGrid[0])
+
+	newGrid = GridFlipper(newGrid)
+	// Part 1 - delete for part 2
+	//newGrid = MoveBalls(newGrid)
+
+	// Flip the block
+
+	for i := 0; i < 1000; i++ {
+		if i%100000 == 0 {
+			fmt.Println(i)
+		}
+
+		// One cycle
+
+		newGrid = MoveBalls(newGrid)
+		newGrid = GridSpinner(newGrid)
+		newGrid = MoveBalls(newGrid)
+		newGrid = GridSpinner(newGrid)
+		newGrid = MoveBalls(newGrid)
+		newGrid = GridSpinner(newGrid)
+		newGrid = MoveBalls(newGrid)
+		newGrid = GridSpinner(newGrid)
+
+		// Count
+		total = 0
+		for _, line := range newGrid {
+			points := LineLength - 1
+			for _, c := range line {
+				if c == "O" {
+					total += points + 1
+				}
+				points--
+			}
+		}
+		fmt.Println(i, total)
+
+	}
+
+}

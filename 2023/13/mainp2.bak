@@ -1,0 +1,166 @@
+package main
+
+import (
+	_ "embed"
+	"fmt"
+	"slices"
+	"strings"
+)
+
+//go:embed sample.txt
+var input string
+var RowsAbove int
+var RowsLeft int
+
+func testABlock(input []string, smudge int) (matched bool, abovefold int) {
+	abovefold = 0
+
+	for i, _ := range input {
+		if i+1 < len(input) && input[i] == input[i+1] {
+
+			// Walk backwards and forwards
+			top := i
+			bottom := i + 1
+			for {
+				if top < 0 || bottom > len(input)-1 {
+					fmt.Println(input)
+					fmt.Println("match", i+1, smudge, top+1, bottom-1)
+					if smudge >= top+1 && smudge <= bottom-1 {
+						fmt.Println("we're in range")
+
+						abovefold += i + 1
+						matched = true
+						return matched, abovefold
+					} else {
+						break
+					}
+				}
+				fmt.Println(top, bottom)
+				if input[top] != input[bottom] {
+					break
+				}
+				top--
+				bottom++
+			}
+		}
+	}
+
+	return matched, abovefold
+}
+
+func main() {
+
+	linesInput := strings.Split(strings.TrimSpace(input), "\n\n")
+	for _, block := range linesInput {
+		blockSplit := strings.Split(block, "\n")
+		blockProcessed := false
+
+		for bi, _ := range blockSplit {
+			for bj, _ := range blockSplit[0] {
+				if blockProcessed {
+					break
+				}
+				newerBlockSplit := slices.Clone(blockSplit)
+
+				newCharacter := "#"
+				if string(blockSplit[bi][bj]) == "#" {
+					newCharacter = "."
+				}
+
+				newerBlockSplit[bi] = blockSplit[bi][:bj] + newCharacter + blockSplit[bi][bj+1:]
+
+				fmt.Println(blockSplit)
+
+				matched, count := testABlock(blockSplit, bi)
+				fmt.Println("OUTPUT SCORE", matched, count)
+				blockProcessed = matched
+
+				// NEW FUNC HERE
+
+				/*
+					for i, _ := range newerBlockSplit {
+						if i+1 < len(newerBlockSplit) && newerBlockSplit[i] == newerBlockSplit[i+1] {
+
+							// Walk backwards and forwards
+							top := i
+							bottom := i + 1
+							for {
+								if top < 0 || bottom > len(newerBlockSplit)-1 {
+									fmt.Println(newerBlockSplit)
+									fmt.Println("match", i+1, bi, top+1, bottom-1)
+									if bi >= top+1 && bi <= bottom-1 {
+										fmt.Println("we're in range")
+
+										RowsAbove += i + 1
+										blockProcessed = true
+										break
+									} else {
+										break
+									}
+								}
+								fmt.Println(top, bottom)
+								if newerBlockSplit[top] != newerBlockSplit[bottom] {
+									break
+								}
+								top--
+								bottom++
+							}
+						}
+					}
+				*/
+
+				// Flip the block and do it all again
+				if !blockProcessed {
+					znewblockSplit := []string{}
+
+					for j := 0; j < len(newerBlockSplit[0]); j++ {
+						znewblockSplit = append(znewblockSplit, "")
+
+						znewblockSplit[j] = ""
+						for i := 0; i < len(newerBlockSplit); i++ {
+							znewblockSplit[j] = znewblockSplit[j] + string(newerBlockSplit[i][j])
+						}
+					}
+					zblockSplit := znewblockSplit
+
+					for i, _ := range zblockSplit {
+						if i+1 < len(zblockSplit) && zblockSplit[i] == zblockSplit[i+1] {
+
+							// Walk backwards and forwards
+							top := i
+							bottom := i + 1
+							for {
+								if top < 0 || bottom > len(zblockSplit)-1 {
+									fmt.Println(zblockSplit)
+									fmt.Println("match", i+1, bi, top+1, bottom-1)
+									if bi >= top+1 && bi <= bottom-1 {
+										fmt.Println("we're in range")
+
+										RowsAbove += i + 1
+										blockProcessed = true
+										break
+									} else {
+										break
+									}
+								}
+								fmt.Println(top, bottom)
+								if zblockSplit[top] != zblockSplit[bottom] {
+									break
+								}
+								top--
+								bottom++
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// 11624 too low
+	// 25000 too low
+
+	// 40200 too high
+	fmt.Println(RowsLeft + 100*RowsAbove)
+
+}

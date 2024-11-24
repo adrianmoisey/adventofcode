@@ -1,0 +1,75 @@
+package main
+
+import (
+	_ "embed"
+	"fmt"
+	"strings"
+)
+
+//go:embed sample.txt
+var input string
+var newGrid [][]string
+var total int
+
+func main() {
+
+	linesInput := strings.Split(strings.TrimSpace(input), "\n")
+
+	// Flip the block
+	gridFlip := []string{}
+
+	for j := 0; j < len(linesInput[0]); j++ {
+		gridFlip = append(gridFlip, "")
+
+		gridFlip[j] = ""
+		for i := 0; i < len(linesInput); i++ {
+			gridFlip[j] = gridFlip[j] + string(linesInput[i][j])
+		}
+	}
+
+	// gridFlip - flipped block
+	//fmt.Println(gridFlip)
+	newGrid = make([][]string, 0)
+
+	// Move all the O's to the left
+	for _, line := range gridFlip {
+		newLine := []string{}
+		for _, character := range line {
+			newLine = append(newLine, string(character))
+		}
+		newGrid = append(newGrid, newLine)
+	}
+
+	for _, line := range newGrid {
+
+		Moved := true
+		for Moved == true {
+
+			Moved = false
+			for i := range line {
+
+				// We find an O, try move it back
+				if line[i] == "O" && i > 0 {
+					if line[i-1] == "." {
+						line[i-1] = "O"
+						line[i] = "."
+						Moved = true
+					}
+
+				}
+			}
+		}
+
+	}
+	fmt.Println(newGrid)
+	for _, line := range newGrid {
+		//slices.Reverse(line)
+		fmt.Println(line)
+		for i, c := range line {
+			if c == "O" {
+				total += i + 1
+			}
+		}
+	}
+	fmt.Println(total)
+}

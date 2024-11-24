@@ -12,7 +12,7 @@ import (
 var input string
 var GalaxyPositions []string
 var Total int
-var ExpansionSize = 1000000 - 1
+var ExpansionSize = 0
 
 func main() {
 	var HorizontalExpansions []int

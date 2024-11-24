@@ -1,0 +1,82 @@
+package main
+
+import (
+	_ "embed"
+	"fmt"
+	"strings"
+)
+
+//go:embed input.txt
+var input string
+var RowsAbove int
+var RowsLeft int
+
+func main() {
+
+	linesInput := strings.Split(strings.TrimSpace(input), "\n\n")
+	for _, block := range linesInput {
+		blockSplit := strings.Split(block, "\n")
+		blockProcessed := false
+
+		for i, _ := range blockSplit {
+			if i+1 < len(blockSplit) && blockSplit[i] == blockSplit[i+1] {
+
+				// Walk backwards and forwards
+				top := i
+				bottom := i + 1
+				for {
+					if top < 0 || bottom > len(blockSplit)-1 {
+						RowsAbove += i + 1
+						blockProcessed = true
+						break
+					}
+					if blockSplit[top] != blockSplit[bottom] {
+						break
+					}
+					top--
+					bottom++
+				}
+			}
+		}
+
+		// Flip the block and do it all again
+		if !blockProcessed {
+			newblockSplit := []string{}
+
+			for j := 0; j < len(blockSplit[0]); j++ {
+				newblockSplit = append(newblockSplit, "")
+
+				newblockSplit[j] = ""
+				for i := 0; i < len(blockSplit); i++ {
+					newblockSplit[j] = newblockSplit[j] + string(blockSplit[i][j])
+				}
+			}
+			blockSplit = newblockSplit
+
+			for i, _ := range blockSplit {
+				if i+1 < len(blockSplit) && blockSplit[i] == blockSplit[i+1] {
+
+					// Walk backwards and forwards
+					top := i
+					bottom := i + 1
+					for {
+						if top < 0 || bottom > len(blockSplit)-1 {
+							RowsLeft += i + 1
+							blockProcessed = true
+							break
+						}
+						if blockSplit[top] != blockSplit[bottom] {
+							break
+						}
+						top--
+						bottom++
+					}
+				}
+			}
+
+		}
+
+	}
+	fmt.Println(RowsLeft + 100*RowsAbove)
+
+}
