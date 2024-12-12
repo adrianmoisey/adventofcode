@@ -118,104 +118,53 @@ func DFS(coord Coords, grid [][]string, Seen map[Coords]bool) int {
 			PeremiterTotal++
 		}
 	}
-	fmt.Println("Seen Local Len", len(SeenLocal))
 
-	sidesTotal := 0
+	direction := "r"
+	corners := 0
+	startCoord := coord
+	pointerCoord := Coords{startCoord.X, startCoord.Y + 1}
+	for {
+		fmt.Println("Pointer", pointerCoord)
+		currentLetter := grid[pointerCoord.X][pointerCoord.Y]
 
-	for x, line := range grid {
-
-		var TopSide bool
-		var TopSideCount int
-		TopSide = false
-
-		var BottomSide bool
-		var BottomSideCount int
-		BottomSide = false
-
-		for y := range line {
-			Test := Coords{x, y}
-			if SeenLocal[Test] {
-				// Do the top
-				if SeenLocal[Coords{x - 1, y}] {
-					if TopSide == true {
-						TopSide = false
-					}
-				} else {
-					if TopSide == false {
-						TopSide = true
-						TopSideCount++
-					}
-				}
-				// Do the Bottom
-				if SeenLocal[Coords{x + 1, y}] {
-					if BottomSide == true {
-						BottomSide = false
-					}
-				} else {
-					if BottomSide == false {
-						BottomSide = true
-						BottomSideCount++
-					}
-				}
+		if direction == "r" {
+			fmt.Println("right")
+			if pointerCoord.Y+1 > len(grid[0])-1 || grid[pointerCoord.X][pointerCoord.Y+1] != currentLetter {
+				direction = "d"
+				corners++
+				pointerCoord = Coords{pointerCoord.X, pointerCoord.Y}
 			} else {
-				BottomSide = false
-				TopSide = false
+				pointerCoord = Coords{pointerCoord.X, pointerCoord.Y + 1}
+			}
+		} else if direction == "d" {
+			fmt.Println("down")
+			if pointerCoord.X+1 > len(grid)-1 || grid[pointerCoord.X+1][pointerCoord.Y] != currentLetter {
+				direction = "l"
+				corners++
+				pointerCoord = Coords{pointerCoord.X, pointerCoord.Y}
+			} else {
+				pointerCoord = Coords{pointerCoord.X + 1, pointerCoord.Y}
+			}
+		} else if direction == "l" {
+			fmt.Println("left")
+			if pointerCoord.Y-1 < 0 || grid[pointerCoord.X][pointerCoord.Y-1] != currentLetter {
+				direction = "u"
+				corners++
+				pointerCoord = Coords{pointerCoord.X, pointerCoord.Y}
+			} else {
+				pointerCoord = Coords{pointerCoord.X, pointerCoord.Y - 1}
+			}
+		} else if direction == "u" {
+			fmt.Println("up")
+			if pointerCoord.X-1 < 0 || grid[pointerCoord.X-1][pointerCoord.Y] != currentLetter {
+				direction = "r"
+				corners++
+				pointerCoord = Coords{pointerCoord.X, pointerCoord.Y}
+			} else {
+				pointerCoord = Coords{pointerCoord.X - 1, pointerCoord.Y}
 			}
 		}
-		fmt.Println("TopSideCount, BottomSideCount", TopSideCount, BottomSideCount)
-		sidesTotal += TopSideCount
-		sidesTotal += BottomSideCount
-	}
-	for x, line := range grid {
-
-		var LeftSide bool
-		var LeftSideCount int
-		LeftSide = false
-
-		var RightSide bool
-		var RightSideCount int
-		RightSide = false
-
-		for y := range line {
-			Test := Coords{y, x}
-			// fmt.Println(Test)
-			if SeenLocal[Test] {
-				// Do the Left
-				if SeenLocal[Coords{y, x - 1}] {
-					if LeftSide == true {
-						LeftSide = false
-					}
-				} else {
-					if LeftSide == false {
-						LeftSide = true
-						LeftSideCount++
-					}
-				}
-				// Do the Right
-				if SeenLocal[Coords{y, x + 1}] {
-					if RightSide == true {
-						RightSide = false
-					}
-				} else {
-					if RightSide == false {
-						RightSide = true
-						RightSideCount++
-					}
-				}
-			} else {
-				RightSide = false
-				LeftSide = false
-			}
-
-		}
-		fmt.Println("LeftSideCount, RightSideCount", LeftSideCount, RightSideCount)
-		sidesTotal += LeftSideCount
-		sidesTotal += RightSideCount
 
 	}
-	fmt.Println(sidesTotal, AreaTotal)
-	return sidesTotal * AreaTotal
+	return AreaTotal * PeremiterTotal
 }
-
-// too low 788561
-//         853588
