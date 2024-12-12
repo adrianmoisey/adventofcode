@@ -1,0 +1,59 @@
+package main
+
+import (
+	_ "embed"
+	"fmt"
+	"strings"
+)
+
+//go:embed input.txt
+var input string
+
+var Grid map[string][]Antenna
+var AntiGrid map[Antenna]bool
+
+func main() {
+	lines := strings.Split(strings.TrimSpace(input), "\n")
+	Part1(lines)
+}
+
+type Antenna struct {
+	X int // Left/Right
+	Y int // Down/Up
+}
+
+func Part1(input []string) {
+	Grid = make(map[string][]Antenna)
+	AntiGrid = make(map[Antenna]bool)
+
+	for x, line := range input {
+		for y, c := range line {
+			if string(c) != "." {
+				Grid[string(c)] = append(Grid[string(c)], Antenna{x, y})
+			}
+		}
+	}
+
+	fmt.Println(Grid)
+	for _, locations := range Grid {
+		for _, location := range locations {
+			for _, otherlocation := range locations {
+				if location == otherlocation {
+					continue
+				}
+				antiX := otherlocation.X - location.X
+				antiY := otherlocation.Y - location.Y
+
+				Anti := Antenna{location.X - antiX, location.Y - antiY}
+				if Anti.X < 0 || Anti.Y < 0 || Anti.X > len(input)-1 || Anti.Y > len(input[0])-1 {
+					continue
+				}
+				fmt.Println("Anti", Anti)
+
+				AntiGrid[Anti] = true
+
+			}
+		}
+	}
+	fmt.Println(len(AntiGrid))
+}

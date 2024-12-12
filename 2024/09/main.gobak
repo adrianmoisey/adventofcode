@@ -1,0 +1,91 @@
+package main
+
+import (
+	_ "embed"
+	"fmt"
+	"slices"
+	"strconv"
+	"strings"
+)
+
+//go:embed sample.txt
+var input string
+
+func main() {
+	lines := strings.Split(strings.TrimSpace(input), "\n")
+	Part1(lines[0])
+}
+
+func Part1(input string) {
+	var BlockID int
+
+	DiskLayout := make([]int, 0)
+	for i, c := range input {
+		if i%2 == 0 {
+			value, _ := strconv.Atoi(string(c))
+			for i := 0; i < value; i++ {
+				DiskLayout = append(DiskLayout, []int{BlockID}...)
+			}
+			BlockID++
+
+		} else {
+			value, _ := strconv.Atoi(string(c))
+			for i := 0; i < value; i++ {
+				DiskLayout = append(DiskLayout, []int{-1}...)
+			}
+		}
+	}
+	fmt.Println(DiskLayout)
+	// Defrag
+	for i := slices.Max(DiskLayout); i >= 0; i-- {
+		indexStart := slices.Index(DiskLayout, i)
+		var indexOffset int
+		for {
+			if indexStart+indexOffset == len(DiskLayout) || DiskLayout[indexStart+indexOffset] != i {
+				break
+			} else {
+				indexOffset++
+			}
+		}
+		fmt.Println("Matched file", DiskLayout[indexStart:indexStart+indexOffset])
+		fmt.Println(DiskLayout)
+
+		for p, v := range DiskLayout {
+			var found bool
+			found = true
+			if v == -1 {
+				for k := indexOffset; k > 0; k-- {
+					// fmt.Println("A", DiskLayout[k+indexOffset])
+					if p+k == len(DiskLayout) || DiskLayout[p+k] != -1 {
+						found = false
+					}
+				}
+			} else {
+				found = false
+			}
+			// fmt.Println("B")
+
+			if found {
+				// fmt.Println("Chunk")
+				for z := 0; z < indexOffset; z++ {
+					// fmt.Println("Z", p+z, p)
+					// fmt.Println(DiskLayout[p+z])
+					// Set new position
+					DiskLayout[p+z] = i
+					// Erase old position
+					for e := indexOffset; e < indexOffset; e++ {
+						DiskLayout[p+e] = -1
+					}
+				}
+			}
+		}
+	}
+	fmt.Println(DiskLayout)
+
+}
+
+func pop(xs *[]int) int {
+	x := (*xs)[len(*xs)-1]
+	*xs = (*xs)[:len(*xs)-1]
+	return x
+}

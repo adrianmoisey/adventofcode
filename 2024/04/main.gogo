@@ -1,0 +1,96 @@
+package main
+
+import (
+	_ "embed"
+	"fmt"
+	"strings"
+)
+
+//go:embed input.txt
+var input string
+
+func main() {
+	lines := strings.Split(strings.TrimSpace(input), "\n")
+
+	Part1(lines)
+}
+
+func Part1(input []string) {
+
+	var horizontalTotal int
+	var verticalTotal int
+	rowLength := len(input[0]) - 1
+	columnLength := len(input) - 1
+
+	for y, line := range input {
+		// fmt.Println(line)
+		horizontalTotal += strings.Count(line, "XMAS")
+		horizontalTotal += strings.Count(line, "SAMX")
+
+		for x, character := range line {
+			if character == 'X' {
+				// Up
+				if y-3 >= 0 {
+					lastCharacter := string(input[y-3][x])
+					if lastCharacter == "S" && string(input[y-2][x]) == "A" && string(input[y-1][x]) == "M" {
+						fmt.Println(string(lastCharacter))
+						verticalTotal++
+					}
+				}
+				// Up Left
+				if y-3 >= 0 && x-3 >= 0 {
+					lastCharacter := string(input[y-3][x-3])
+					if lastCharacter == "S" && string(input[y-2][x-2]) == "A" && string(input[y-1][x-1]) == "M" {
+						fmt.Println(string(lastCharacter))
+						verticalTotal++
+					}
+				}
+
+				// Up Right
+				if y-3 >= 0 && x+3 <= rowLength {
+					lastCharacter := string(input[y-3][x+3])
+					if lastCharacter == "S" && string(input[y-2][x+2]) == "A" && string(input[y-1][x+1]) == "M" {
+						fmt.Println(string(lastCharacter))
+						verticalTotal++
+					}
+				}
+
+				// Down
+				if y+3 <= columnLength {
+					lastCharacter := string(input[y+3][x])
+					if lastCharacter == "S" && string(input[y+2][x]) == "A" && string(input[y+1][x]) == "M" {
+						fmt.Println(string(lastCharacter))
+						verticalTotal++
+					}
+				}
+
+				// Down Left
+				if y+3 <= columnLength && x-3 >= 0 {
+					lastCharacter := string(input[y+3][x-3])
+					if lastCharacter == "S" && string(input[y+2][x-2]) == "A" && string(input[y+1][x-1]) == "M" {
+						fmt.Println(string(lastCharacter))
+						verticalTotal++
+
+					}
+				}
+
+				// Down Right
+				if y+3 <= columnLength && x+3 <= rowLength {
+					lastCharacter := string(input[y+3][x+3])
+					if lastCharacter == "S" && string(input[y+2][x+2]) == "A" && string(input[y+1][x+1]) == "M" {
+						fmt.Println(string(lastCharacter))
+						verticalTotal++
+					}
+				}
+
+				// fmt.Println(character)
+			}
+		}
+
+	}
+
+	fmt.Println("Part 1", horizontalTotal+verticalTotal)
+	fmt.Println("Part 1", horizontalTotal)
+	fmt.Println("Part 1", verticalTotal)
+
+}

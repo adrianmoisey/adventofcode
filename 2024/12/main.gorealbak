@@ -1,0 +1,67 @@
+package main
+
+import (
+	_ "embed"
+	"fmt"
+	"strings"
+)
+
+//go:embed sample.txt
+var input string
+
+func main() {
+	lines := strings.Split(strings.TrimSpace(input), "\n")
+	Part1(lines)
+}
+
+func Part1(input []string) {
+	var TotalArea map[string]int
+	var TotalPerimeter map[string]int
+
+	TotalArea = make(map[string]int)
+	TotalPerimeter = make(map[string]int)
+
+	for x, line := range input {
+		for y, character := range line {
+
+			TotalArea[string(character)] += 1
+			TotalPerimeter[string(character)] += Process(x, y, string(character), input)
+
+		}
+	}
+	fmt.Println("Area", TotalArea)
+	fmt.Println("Peremiter", TotalPerimeter)
+	total := 0
+	for k, v := range TotalArea {
+		total += v * TotalPerimeter[k]
+	}
+	fmt.Println(total)
+
+}
+
+func Process(x, y int, character string, input []string) int {
+	fmt.Println("Position", x, y, character)
+	var total int
+
+	if x <= 0 || string(input[x-1][y]) != character {
+		fmt.Println("Up")
+		total++
+	}
+	if x >= len(input)-1 || string(input[x+1][y]) != character {
+		fmt.Println("Down")
+
+		total++
+	}
+
+	if y <= 0 || string(input[x][y-1]) != character {
+		fmt.Println("Left")
+		total++
+	}
+	if y >= len(input)-1 || string(input[x][y+1]) != character {
+		fmt.Println("Right")
+		total++
+	}
+
+	fmt.Println(total)
+	return total
+}

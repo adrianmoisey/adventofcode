@@ -1,0 +1,119 @@
+package main
+
+import (
+	_ "embed"
+	"fmt"
+	"slices"
+	"strings"
+)
+
+//go:embed input.txt
+var input string
+
+func main() {
+	lines := strings.Split(strings.TrimSpace(input), "\n")
+	Part1(lines)
+}
+
+type Position struct {
+	X   int
+	Y   int
+	OGX int
+	OGY int
+}
+
+func Part1(input []string) {
+	var StartingPositions []Position
+	for x, line := range input {
+		for y, c := range line {
+			if string(c) == "0" {
+				StartingPositions = append(StartingPositions, Position{x, y, x, y})
+			}
+		}
+	}
+	var GrandTotal int
+	for _, startingPostition := range StartingPositions {
+		Found := make([]Position, 0)
+		FetchNextDigits(startingPostition, []Position{startingPostition}, &input, &Found)
+		fmt.Println("Found", len(Found), Found)
+		GrandTotal += len(Found)
+	}
+	fmt.Println(GrandTotal)
+}
+
+func FetchNextDigits(ogStart Position, positions []Position, grid *[]string, total *[]Position) {
+	fmt.Println("Positions to explore", positions)
+	fmt.Println("Found places", total)
+	FoundPositions := make([]Position, 0)
+	for _, position := range positions {
+		fmt.Println("Current position", position)
+		CurrentDigit := (*grid)[position.X][position.Y]
+
+		if position.X-1 >= 0 {
+			Up := (*grid)[position.X-1][position.Y]
+			if string(Up) == "9" && Up == CurrentDigit+1 {
+				if !slices.Contains(*total, Position{position.X - 1, position.Y, ogStart.OGX, ogStart.OGY}) {
+					*total = append(*total, Position{position.X - 1, position.Y, ogStart.OGX, ogStart.OGY})
+				}
+			} else if Up == CurrentDigit+1 {
+				FoundPositions = append(FoundPositions, Position{position.X - 1, position.Y, -1, -1})
+			}
+		}
+
+		if position.X+1 < len(*grid) {
+			Down := (*grid)[position.X+1][position.Y]
+			if string(Down) == "9" && Down == CurrentDigit+1 {
+				if !slices.Contains(*total, Position{position.X + 1, position.Y, ogStart.OGX, ogStart.OGY}) {
+					*total = append(*total, Position{position.X + 1, position.Y, ogStart.OGX, ogStart.OGY})
+				}
+
+			} else if Down == CurrentDigit+1 {
+				FoundPositions = append(FoundPositions, Position{position.X + 1, position.Y, -1, -1})
+			}
+		}
+
+		if position.Y-1 >= 0 {
+			Left := (*grid)[position.X][position.Y-1]
+			if string(Left) == "9" && Left == CurrentDigit+1 {
+				if !slices.Contains(*total, Position{position.X, position.Y - 1, ogStart.OGX, ogStart.OGY}) {
+					*total = append(*total, Position{position.X, position.Y - 1, ogStart.OGX, ogStart.OGY})
+				}
+
+			} else if Left == CurrentDigit+1 {
+				FoundPositions = append(FoundPositions, Position{position.X, position.Y - 1, -1, -1})
+			}
+		}
+
+		if position.Y+1 < len((*grid)[0]) {
+			Right := (*grid)[position.X][position.Y+1]
+			if string(Right) == "9" && Right == CurrentDigit+1 {
+
+				if !slices.Contains(*total, Position{position.X, position.Y + 1, ogStart.OGX, ogStart.OGY}) {
+
+					*total = append(*total, Position{position.X, position.Y + 1, ogStart.OGX, ogStart.OGY})
+				}
+			} else if Right == CurrentDigit+1 {
+
+				FoundPositions = append(FoundPositions, Position{position.X, position.Y + 1, -1, -1})
+			}
+		}
+
+	}
+	if len(FoundPositions) == 0 {
+		return
+	} else {
+		FetchNextDigits(ogStart, FoundPositions, grid, total)
+	}
+
+}
+
+/*
+89X1X123
+78121874
+8743X965
+96549874
+45678903
+32X19X12
+X13298X1
+1X456732
+*/

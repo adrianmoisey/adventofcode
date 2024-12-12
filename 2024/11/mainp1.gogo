@@ -1,0 +1,57 @@
+package main
+
+import (
+	_ "embed"
+	"fmt"
+	"strconv"
+	"strings"
+)
+
+//go:embed input.txt
+var input string
+
+func main() {
+	lines := strings.Split(strings.TrimSpace(input), "\n")
+	Part1(lines[0])
+}
+
+func Part1(input string) {
+	var InputList []int
+
+	for _, num := range strings.Split(input, " ") {
+		numInt, _ := strconv.Atoi(num)
+		InputList = append(InputList, numInt)
+	}
+
+	for i := 0; i < 75; i++ {
+		fmt.Println(i)
+		InputList = Process(InputList)
+	}
+	fmt.Println(len(InputList))
+
+}
+
+func Process(input []int) (outup []int) {
+
+	var output []int
+	for _, inputNum := range input {
+		numString := strconv.Itoa(inputNum)
+		if inputNum == 0 {
+			output = append(output, 1)
+		} else if len(numString)%2 == 0 {
+			halfWay := len(numString) / 2
+			left := numString[:halfWay]
+			right := numString[halfWay:]
+
+			leftInt, _ := strconv.Atoi(left)
+			rightInt, _ := strconv.Atoi(right)
+
+			output = append(output, leftInt)
+			output = append(output, rightInt)
+
+		} else {
+			output = append(output, inputNum*2024)
+		}
+	}
+	return output
+}

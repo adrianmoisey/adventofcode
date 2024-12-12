@@ -1,0 +1,75 @@
+package main
+
+import (
+	_ "embed"
+	"fmt"
+	"strings"
+)
+
+//go:embed input.txt
+var input string
+
+func main() {
+	lines := strings.Split(strings.TrimSpace(input), "\n")
+
+	Part1(lines)
+}
+
+type Location struct {
+	width  int
+	height int
+}
+
+func Part1(input []string) {
+	var guard Location
+	var guard_direction string
+	guard_direction = "^"
+
+	for i, line := range input {
+		for j, char := range line {
+			if string(char) == guard_direction {
+				guard.height = i
+				guard.width = j
+			}
+		}
+	}
+	fmt.Println(guard, guard_direction)
+
+	var next Location
+
+	var visited = make(map[Location]bool)
+
+	for {
+		next = guard
+		if guard_direction == "^" {
+			next.height -= 1
+		} else if guard_direction == "v" {
+			next.height += 1
+		} else if guard_direction == ">" {
+			next.width += 1
+		} else if guard_direction == "<" {
+			next.width -= 1
+		}
+		fmt.Print(next)
+		next_block := string(input[next.height][next.width])
+
+		if next_block == "#" {
+			if guard_direction == "^" {
+				guard_direction = ">"
+			} else if guard_direction == ">" {
+				guard_direction = "v"
+			} else if guard_direction == "v" {
+				guard_direction = "<"
+			} else if guard_direction == "<" {
+				guard_direction = "^"
+			}
+		} else {
+			guard = next
+			visited[guard] = true
+		}
+
+		fmt.Println(next_block)
+		fmt.Println("Turns", len(visited))
+	}
+
+}
